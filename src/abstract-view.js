@@ -5,8 +5,23 @@
 // you won't ever need to extend from this class. Use the other Views
 // to build new classes.
 //
+import Backbone                 from 'backbone';
+import _                        from 'underscore';
+import Behaviors                from './behaviors';
+import _getValue                from './utils/_getValue';
+import getOption                from './utils/getOption';
+import normalizeMethods         from './utils/normalizeMethods';
+import normalizeUIKeys          from './utils/normalizeUIKeys';
+import normalizeUIValues        from './utils/normalizeUIValues';
+import mergeOptions             from './utils/mergeOptions';
+import proxyGetOption           from './utils/proxyGetOption';
+import MonitorDOMRefresh        from './dom-refresh';
+import MarionetteError          from './error';
+import Renderer                 from './renderer';
+import { proxyBindEntityEvents, proxyUnbindEntityEvents } from './bind-entity-events';
+import { _triggerMethod }       from './trigger-method';
 
-Marionette.AbstractView = Backbone.View.extend({
+var AbstractView = Backbone.View.extend({
 
   supportsRenderLifecycle: true,
   supportsDestroyLifecycle: true,
@@ -31,14 +46,14 @@ Marionette.AbstractView = Backbone.View.extend({
     // at some point however this may be removed
     this.options = _.extend({}, _.result(this, 'options'), options);
 
-    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
-    this._behaviors = Marionette.Behaviors(this, behaviors);
+    var behaviors = _getValue(this.getOption('behaviors'), this);
+    this._behaviors = Behaviors(this, behaviors);
 
     Backbone.View.call(this, this.options);
 
     this.delegateEntityEvents();
 
-    Marionette.MonitorDOMRefresh(this);
+    MonitorDOMRefresh(this);
   },
 
   // Get the template for this view
@@ -63,7 +78,7 @@ Marionette.AbstractView = Backbone.View.extend({
     var data = this.mixinTemplateContext(this.serializeData());
 
     // Render and add to el
-    var html = Marionette.Renderer.render(template, data, this);
+    var html = Renderer.render(template, data, this);
     this.attachElContent(html);
   },
 
@@ -84,7 +99,7 @@ Marionette.AbstractView = Backbone.View.extend({
   mixinTemplateContext: function(target) {
     target = target || {};
     var templateContext = this.getOption('templateContext');
-    templateContext = Marionette._getValue(templateContext, this);
+    templateContext = _getValue(templateContext, this);
     return _.extend(target, templateContext);
   },
 
@@ -92,7 +107,7 @@ Marionette.AbstractView = Backbone.View.extend({
   // `{"@ui.foo": "bar"}`
   normalizeUIKeys: function(hash) {
     var uiBindings = _.result(this, '_uiBindings');
-    return Marionette.normalizeUIKeys(hash, uiBindings || _.result(this, 'ui'));
+    return normalizeUIKeys(hash, uiBindings || _.result(this, 'ui'));
   },
 
   // normalize the values of passed hash with the views `ui` selectors.
@@ -100,7 +115,7 @@ Marionette.AbstractView = Backbone.View.extend({
   normalizeUIValues: function(hash, properties) {
     var ui = _.result(this, 'ui');
     var uiBindings = _.result(this, '_uiBindings');
-    return Marionette.normalizeUIValues(hash, uiBindings || ui, properties);
+    return normalizeUIValues(hash, uiBindings || ui, properties);
   },
 
   // Configure `triggers` to forward DOM events to view
@@ -122,7 +137,7 @@ Marionette.AbstractView = Backbone.View.extend({
   // Overriding Backbone.View's `delegateEvents` to handle
   // `events` and `triggers`
   delegateEvents: function(eventsArg) {
-    var events = Marionette._getValue(eventsArg || this.events, this);
+    var events = _getValue(eventsArg || this.events, this);
 
     // normalize ui keys
     events = this.normalizeUIKeys(events);
@@ -174,7 +189,7 @@ Marionette.AbstractView = Backbone.View.extend({
   // Internal helper method to verify whether the view hasn't been destroyed
   _ensureViewIsIntact: function() {
     if (this._isDestroyed) {
-      throw new Marionette.Error({
+      throw new MarionetteError({
         name: 'ViewDestroyedError',
         message: 'View (cid: "' + this.cid + '") has already been destroyed and cannot be used.'
       });
@@ -316,7 +331,7 @@ Marionette.AbstractView = Backbone.View.extend({
   // import the `triggerMethod` to trigger events with corresponding
   // methods if the method exists
   triggerMethod: function() {
-    var ret = Marionette._triggerMethod(this, arguments);
+    var ret = _triggerMethod(this, arguments);
 
     this._triggerEventOnBehaviors(arguments);
     this._triggerEventOnParentLayout(arguments[0], _.rest(arguments));
@@ -325,7 +340,7 @@ Marionette.AbstractView = Backbone.View.extend({
   },
 
   _triggerEventOnBehaviors: function(args) {
-    var triggerMethod = Marionette._triggerMethod;
+    var triggerMethod = _triggerMethod;
     var behaviors = this._behaviors;
     // Use good ol' for as this is a very hot function
     for (var i = 0, length = behaviors && behaviors.length; i < length; i++) {
@@ -340,14 +355,14 @@ Marionette.AbstractView = Backbone.View.extend({
     }
 
     // invoke triggerMethod on parent view
-    var eventPrefix = Marionette.getOption(layoutView, 'childViewEventPrefix');
+    var eventPrefix = getOption(layoutView, 'childViewEventPrefix');
     var prefixedEventName = eventPrefix + ':' + eventName;
     var callArgs = [this].concat(args);
 
-    Marionette._triggerMethod(layoutView, [prefixedEventName].concat(callArgs));
+    _triggerMethod(layoutView, [prefixedEventName].concat(callArgs));
 
     // call the parent view's childEvents handler
-    var childEvents = Marionette.getOption(layoutView, 'childEvents');
+    var childEvents = getOption(layoutView, 'childEvents');
     var normalizedChildEvents = layoutView.normalizeMethods(childEvents);
 
     if (!!normalizedChildEvents && _.isFunction(normalizedChildEvents[eventName])) {
@@ -391,23 +406,25 @@ Marionette.AbstractView = Backbone.View.extend({
   _parentItemView: function() {
     var ancestors = this._getAncestors();
     return _.find(ancestors, function(parent) {
-      return parent instanceof Marionette.View;
+      return parent instanceof AbstractView;
     });
   },
 
   // Imports the "normalizeMethods" to transform hashes of
   // events=>function references/names to a hash of events=>function references
-  normalizeMethods: Marionette.normalizeMethods,
+  normalizeMethods: normalizeMethods,
 
   // A handy way to merge passed-in options onto the instance
-  mergeOptions: Marionette.mergeOptions,
+  mergeOptions: mergeOptions,
 
   // Proxy `getOption` to enable getting options from this or this.options by name.
-  getOption: Marionette.proxyGetOption,
+  getOption: proxyGetOption,
 
   // Proxy `bindEntityEvents` to enable binding view's events from another entity.
-  bindEntityEvents: Marionette.proxyBindEntityEvents,
+  bindEntityEvents: proxyBindEntityEvents,
 
   // Proxy `unbindEntityEvents` to enable unbinding view's events from another entity.
-  unbindEntityEvents: Marionette.proxyUnbindEntityEvents
+  unbindEntityEvents: proxyUnbindEntityEvents
 });
+
+export default AbstractView;

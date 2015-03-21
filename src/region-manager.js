@@ -1,15 +1,21 @@
 // Region Manager
 // --------------
 
+import _               from 'underscore';
+import actAsCollection from './utils/actAsCollection';
+import MNObject        from './object';
+import Region          from './region';
+import _getValue       from './utils/_getValue';
+
 // Manage one or more related `Marionette.Region` objects.
-Marionette.RegionManager = Marionette.Object.extend({
+var RegionManager = MNObject.extend({
   cidPrefix: 'mnrm',
 
   constructor: function(options) {
     this._regions = {};
     this.length = 0;
 
-    Marionette.Object.call(this, options);
+    MNObject.call(this, options);
 
     this.addRegions(this.getOption('regions'));
   },
@@ -19,7 +25,7 @@ Marionette.RegionManager = Marionette.Object.extend({
   // each key becomes the region name, and each value is
   // the region definition.
   addRegions: function(regionDefinitions, defaults) {
-    regionDefinitions = Marionette._getValue(regionDefinitions, this, arguments);
+    regionDefinitions = _getValue(regionDefinitions, this, arguments);
 
     return _.reduce(regionDefinitions, function(regions, definition, name) {
       if (_.isString(definition)) {
@@ -39,10 +45,10 @@ Marionette.RegionManager = Marionette.Object.extend({
   addRegion: function(name, definition) {
     var region;
 
-    if (definition instanceof Marionette.Region) {
+    if (definition instanceof Region) {
       region = definition;
     } else {
-      region = Marionette.Region.buildRegion(definition, Marionette.Region);
+      region = Region.buildRegion(definition, Region);
     }
 
     this.triggerMethod('before:add:region', name, region);
@@ -96,7 +102,7 @@ Marionette.RegionManager = Marionette.Object.extend({
   // manager entirely
   destroy: function() {
     this.removeRegions();
-    return Marionette.Object.prototype.destroy.apply(this, arguments);
+    return MNObject.prototype.destroy.apply(this, arguments);
   },
 
   // internal method to store regions
@@ -121,4 +127,6 @@ Marionette.RegionManager = Marionette.Object.extend({
   }
 });
 
-Marionette.actAsCollection(Marionette.RegionManager.prototype, '_regions');
+actAsCollection(RegionManager.prototype, '_regions');
+
+export default RegionManager;

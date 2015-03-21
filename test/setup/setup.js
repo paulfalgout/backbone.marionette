@@ -1,6 +1,5 @@
 module.exports = function() {
   global.expect = global.chai.expect;
-
   var $fixtures;
 
   function setFixtures() {

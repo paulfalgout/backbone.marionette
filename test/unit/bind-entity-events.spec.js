@@ -8,9 +8,9 @@ describe('Marionette.bindEntityEvents', function() {
     this.entityStub    = this.sinon.stub();
 
     this.target = {
-      handleFoo : this.handleFooStub,
-      handleBar : this.handleBarStub,
-      listenTo  : this.listenToStub
+      handleFoo: this.handleFooStub,
+      handleBar: this.handleBarStub,
+      listenTo:  this.listenToStub
     };
 
     this.entity = this.entityStub;
@@ -101,7 +101,7 @@ describe('Marionette.bindEntityEvents', function() {
           var suite = this;
           expect(function() {
             Marionette.bindEntityEvents(suite.target, suite.entity, {'baz': 'doesNotExist'});
-          }).to.throw('Method "doesNotExist" was configured as an event handler, but does not exist.');
+          }).to.throw('Error: Method "doesNotExist" was configured as an event handler, but does not exist.');
         });
       });
     });
@@ -132,10 +132,7 @@ describe('Marionette.bindEntityEvents', function() {
     });
 
     it('should error', function() {
-      expect(this.run).to.throw(Marionette.Error, new Marionette.Error({
-        message: 'Bindings must be an object or function.',
-        url: 'marionette.functions.html#marionettebindentityevents'
-      }));
+      expect(this.run).to.throw('Error: Bindings must be an object or function.');
     });
   });
 

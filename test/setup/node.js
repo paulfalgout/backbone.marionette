@@ -4,6 +4,8 @@ var sinonChai = require('sinon-chai');
 var chaiJq = require('chai-jq');
 var requireHelper = require('./require-helper');
 
+import Marionette from '../../src/backbone-marionette';
+
 chai.use(sinonChai);
 chai.use(chaiJq);
 
@@ -30,43 +32,9 @@ global.$ = global.jQuery = require('jquery');
 global._ = require('underscore');
 global.Backbone = require('backbone');
 global.Backbone.$ = global.$;
-global.Marionette = Backbone.Marionette = {};
+global.Marionette = Backbone.Marionette = Marionette;
 
 requireHelper('features');
-Marionette.FEATURES.class = true;
 
 require('backbone.babysitter');
 require('backbone.radio');
-
-requireHelper('bind-entity-events');
-requireHelper('radio-helpers');
-requireHelper('trigger-method');
-
-requireHelper('utils/extend');
-requireHelper('utils/isNodeAttached');
-requireHelper('utils/mergeOptions');
-requireHelper('utils/getOption');
-requireHelper('utils/proxyGetOption');
-requireHelper('utils/_getValue');
-requireHelper('utils/normalizeMethods');
-requireHelper('utils/normalizeUIString');
-requireHelper('utils/normalizeUIKeys');
-requireHelper('utils/normalizeUIValues');
-requireHelper('utils/actAsCollection');
-requireHelper('utils/deprecate');
-
-requireHelper('dom-refresh');
-requireHelper('object');
-requireHelper('app-router');
-requireHelper('application');
-requireHelper('renderer');
-requireHelper('template-cache');
-requireHelper('abstract-view');
-requireHelper('view');
-requireHelper('collection-view');
-requireHelper('composite-view');
-requireHelper('behavior');
-requireHelper('behaviors');
-requireHelper('region');
-requireHelper('region-manager');
-requireHelper('error');

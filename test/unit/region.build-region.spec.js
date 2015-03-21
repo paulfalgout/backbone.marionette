@@ -274,10 +274,10 @@ describe('Region', function() {
             myOtherRegionOption: 'foobar'
           };
 
-          this.region = Marionette.buildRegion(this.definition, this.DefaultRegionClass);
+          this.region = Marionette.Region.buildRegion(this.definition, this.DefaultRegionClass);
         });
 
-        expect('it sets the region options', function() {
+        it('it sets the region options', function() {
           expect(this.region.getOption('myRegionOption')).to.equal(42);
           expect(this.region.getOption('myOtherRegionOption')).to.equal('foobar');
         });
@@ -300,10 +300,7 @@ describe('Region', function() {
       });
 
       it('throws an error', function() {
-        expect(this.buildRegion).to.throw(Marionette.Error, new Marionette.Error({
-          message: 'Improper region configuration type.',
-          url: 'marionette.region.html#region-configuration-types'
-        }));
+        expect(this.buildRegion).to.throw('Error: Improper region configuration type.');
       });
     });
   });
