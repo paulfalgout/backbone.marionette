@@ -1,14 +1,14 @@
+/* jshint maxcomplexity: 16, maxstatements: 45, maxlen: 120 */
+
 // View
 // ---------
 
 // The standard view. Includes view events, automatic rendering
 // of Underscore templates, nested views, and more.
-Marionette.View = Marionette.AbstractView.extend({
+Marionette.View = Backbone.View.extend({
   regionClass: Marionette.Region,
 
-  options: {
-    destroyImmediate: false
-  },
+  destroyImmediate: false,
 
   // used as the prefix for child view events
   // that are forwarded through the layoutview
@@ -24,7 +24,22 @@ Marionette.View = Marionette.AbstractView.extend({
 
     this.regions = this.regions || {};
 
-    Marionette.AbstractView.prototype.constructor.apply(this, arguments);
+    _.bindAll(this, 'render');
+
+    // this exposes view options to the view initializer
+    // this is a backfill since backbone removed the assignment
+    // of this.options
+    // at some point however this may be removed
+    this.options = _.extend({}, _.result(this, 'options'), options);
+
+    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
+    this._behaviors = Marionette.Behaviors(this, behaviors);
+
+    Backbone.View.call(this, this.options);
+
+    this.delegateEntityEvents();
+
+    Marionette.MonitorDOMRefresh(this);
   },
 
   // Serialize the view's model *or* collection, if
@@ -205,7 +220,32 @@ Marionette.View = Marionette.AbstractView.extend({
       this.$el.remove();
     }
     this.regionManager.destroy();
-    return Marionette.AbstractView.prototype.destroy.apply(this, arguments);
+
+    var args = _.toArray(arguments);
+
+    this.triggerMethod.apply(this, ['before:destroy'].concat(args));
+
+    // mark as destroyed before doing the actual destroy, to
+    // prevent infinite loops within "destroy" event handlers
+    // that are trying to destroy other views
+    this.isDestroyed = true;
+    this.triggerMethod.apply(this, ['destroy'].concat(args));
+
+    // unbind UI elements
+    this.unbindUIElements();
+
+    this.isRendered = false;
+
+    // remove the view from the DOM
+    this.remove();
+
+    // Call destroy on each behavior after
+    // destroying the view.
+    // This unbinds event listeners
+    // that behaviors have registered for.
+    _.invoke(this._behaviors, 'destroy', args);
+
+    return this;
   },
 
   // Internal method to initialize the regions that have been defined in a
@@ -265,3 +305,5 @@ Marionette.View = Marionette.AbstractView.extend({
       .value();
   }
 });
+
+_.extend(Marionette.View.prototype, Marionette.ViewMixin);

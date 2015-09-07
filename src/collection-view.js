@@ -5,7 +5,7 @@
 
 // A view that iterates over a Backbone.Collection
 // and renders an individual child view for each model.
-Marionette.CollectionView = Marionette.AbstractView.extend({
+Marionette.CollectionView = Backbone.View.extend({
 
   // used as the prefix for child view events
   // that are forwarded through the collectionview
@@ -23,9 +23,26 @@ Marionette.CollectionView = Marionette.AbstractView.extend({
   // to use a custom sort order for the collection.
   constructor: function(options) {
     this.once('render', this._initialEvents);
-    this._initChildViewStorage();
 
-    Marionette.AbstractView.prototype.constructor.apply(this, arguments);
+    this._initChildViewStorage();
+    this.initRenderBuffer();
+
+    _.bindAll(this, 'render');
+
+    // this exposes view options to the view initializer
+    // this is a backfill since backbone removed the assignment
+    // of this.options
+    // at some point however this may be removed
+    this.options = _.extend({}, _.result(this, 'options'), options);
+
+    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
+    this._behaviors = Marionette.Behaviors(this, behaviors);
+
+    Backbone.View.call(this, this.options);
+
+    this.delegateEntityEvents();
+
+    Marionette.MonitorDOMRefresh(this);
 
     this.on({
       'before:show':   this._onBeforeShowCalled,
@@ -33,7 +50,6 @@ Marionette.CollectionView = Marionette.AbstractView.extend({
       'before:attach': this._onBeforeAttachCalled,
       'attach':        this._onAttachCalled
     });
-    this.initRenderBuffer();
   },
 
   // Instead of inserting elements one by one into the page,
@@ -612,7 +628,31 @@ Marionette.CollectionView = Marionette.AbstractView.extend({
     this.destroyChildren({checkEmpty: false});
     this.triggerMethod('destroy:collection');
 
-    return Marionette.AbstractView.prototype.destroy.apply(this, arguments);
+    var args = _.toArray(arguments);
+
+    this.triggerMethod.apply(this, ['before:destroy'].concat(args));
+
+    // mark as destroyed before doing the actual destroy, to
+    // prevent infinite loops within "destroy" event handlers
+    // that are trying to destroy other views
+    this.isDestroyed = true;
+    this.triggerMethod.apply(this, ['destroy'].concat(args));
+
+    // unbind UI elements
+    this.unbindUIElements();
+
+    this.isRendered = false;
+
+    // remove the view from the DOM
+    this.remove();
+
+    // Call destroy on each behavior after
+    // destroying the view.
+    // This unbinds event listeners
+    // that behaviors have registered for.
+    _.invoke(this._behaviors, 'destroy', args);
+
+    return this;
   },
 
   // Destroy the child views that this collection view
@@ -678,3 +718,5 @@ Marionette.CollectionView = Marionette.AbstractView.extend({
     return this.getOption('viewComparator');
   }
 });
+
+_.extend(Marionette.CollectionView.prototype, Marionette.ViewMixin);

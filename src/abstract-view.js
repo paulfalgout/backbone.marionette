@@ -7,27 +7,8 @@
 // to build new classes.
 //
 
-Marionette.AbstractView = Backbone.View.extend({
+Marionette.ViewMixin = {
   isDestroyed: false,
-
-  constructor: function(options) {
-    _.bindAll(this, 'render');
-
-    // this exposes view options to the view initializer
-    // this is a backfill since backbone removed the assignment
-    // of this.options
-    // at some point however this may be removed
-    this.options = _.extend({}, _.result(this, 'options'), options);
-
-    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
-    this._behaviors = Marionette.Behaviors(this, behaviors);
-
-    Backbone.View.call(this, this.options);
-
-    this.delegateEntityEvents();
-
-    Marionette.MonitorDOMRefresh(this);
-  },
 
   // Get the template for this view
   // instance. You can set a `template` attribute in the view
@@ -149,40 +130,6 @@ Marionette.AbstractView = Backbone.View.extend({
         message: 'View (cid: "' + this.cid + '") has already been destroyed and cannot be used.'
       });
     }
-  },
-
-  // Default `destroy` implementation, for removing a view from the
-  // DOM and unbinding it. Regions will call this method
-  // for you. You can specify an `onDestroy` method in your view to
-  // add custom code that is called after the view is destroyed.
-  destroy: function() {
-    if (this.isDestroyed) { return this; }
-
-    var args = _.toArray(arguments);
-
-    this.triggerMethod.apply(this, ['before:destroy'].concat(args));
-
-    // mark as destroyed before doing the actual destroy, to
-    // prevent infinite loops within "destroy" event handlers
-    // that are trying to destroy other views
-    this.isDestroyed = true;
-    this.triggerMethod.apply(this, ['destroy'].concat(args));
-
-    // unbind UI elements
-    this.unbindUIElements();
-
-    this.isRendered = false;
-
-    // remove the view from the DOM
-    this.remove();
-
-    // Call destroy on each behavior after
-    // destroying the view.
-    // This unbinds event listeners
-    // that behaviors have registered for.
-    _.invoke(this._behaviors, 'destroy', args);
-
-    return this;
   },
 
   bindUIElements: function() {
@@ -326,12 +273,6 @@ Marionette.AbstractView = Backbone.View.extend({
     }
   },
 
-  // This method returns any views that are immediate
-  // children of this view
-  _getImmediateChildren: function() {
-    return [];
-  },
-
   // Returns an array of every nested view within this view
   _getNestedViews: function() {
     var children = this._getImmediateChildren();
@@ -381,4 +322,4 @@ Marionette.AbstractView = Backbone.View.extend({
 
   // Proxy `unbindEntityEvents` to enable unbinding view's events from another entity.
   unbindEntityEvents: Marionette.proxyUnbindEntityEvents
-});
+};
