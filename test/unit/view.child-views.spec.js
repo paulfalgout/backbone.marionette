@@ -153,9 +153,7 @@ describe('layoutView', function() {
     });
 
     it('should supply the layoutView.options to the function when calling it', function() {
-      expect(_.extend({
-        destroyImmediate: false
-      }, this.options)).to.deep.equal(this.layoutView.options);
+      expect(_.extend(this.options)).to.deep.equal(this.layoutView.options);
     });
 
     it('should build the regions from the returns object literal', function() {
@@ -263,8 +261,8 @@ describe('layoutView', function() {
 
     it('should remove itself from the DOM before destroying child regions if flag set via options', function() {
       expect(this.regionOneView.hadParent).to.be.false;
-      this.viewOptions = null;
-      this.View.prototype.options.destroyImmediate = true;
+      this.viewOptions = undefined;
+      this.View.prototype.destroyImmediate = true;
     });
 
     it('should remove itself from the DOM before destroying child regions if flag set on proto options', function() {
@@ -428,17 +426,6 @@ describe('layoutView', function() {
     it('should throw an error', function() {
       expect(this.layoutView.render).to.throw('View (cid: "' + this.layoutView.cid +
           '") has already been destroyed and cannot be used.');
-    });
-  });
-
-  describe('has a valid inheritance chain back to Marionette.AbstractView', function() {
-    beforeEach(function() {
-      this.constructor = this.sinon.spy(Marionette.AbstractView.prototype, 'constructor');
-      this.layoutView = new Marionette.View();
-    });
-
-    it('calls the parent Marionette.AbstractViews constructor function on instantiation', function() {
-      expect(this.constructor).to.have.been.called;
     });
   });
 

@@ -32,10 +32,12 @@ describe('collection view', function() {
       // Init region manager creates a circular reference, which explodes Sinon's deep equals
       // assertion. Some tests do not care if the view has a region manager or not, but do care
       // about deep equality.
-      _initializeRegions: function() {},
-      // The View's destroy method tries to destroy the RegionManager, which, from the above,
-      // does not exist.
-      destroy: Marionette.AbstractView.prototype.destroy
+      _initializeRegions: function() {
+        // The View's destroy method tries to destroy the RegionManager
+        this.regionManager = {
+          destroy: function() {}
+        };
+      }
     });
 
     this.CollectionView = Marionette.CollectionView.extend({
@@ -1231,17 +1233,6 @@ describe('collection view', function() {
 
     it('should not break', function() {
       // Intentionally left blank
-    });
-  });
-
-  describe('has a valid inheritance chain back to Marionette.AbstractView', function() {
-    beforeEach(function() {
-      this.constructor = this.sinon.spy(Marionette.AbstractView.prototype, 'constructor');
-      this.collectionView = new Marionette.CollectionView();
-    });
-
-    it('calls the parent Marionette.AbstractViews constructor function on instantiation', function() {
-      expect(this.constructor).to.have.been.called;
     });
   });
 
