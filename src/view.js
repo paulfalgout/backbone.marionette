@@ -7,10 +7,6 @@
 // of Underscore templates, nested views, and more.
 Marionette.View = Backbone.View.extend({
 
-  // used as the prefix for child view events
-  // that are forwarded through the layoutview
-  childViewEventPrefix: 'childview',
-
   constructor: function(options) {
     _.bind(this.render, this);
 
@@ -19,8 +15,7 @@ Marionette.View = Backbone.View.extend({
     Marionette.MonitorDOMRefresh(this);
 
     this._initRegions();
-    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
-    this._behaviors = Marionette.Behaviors(this, behaviors);
+    this._initBehaviors();
 
     Backbone.View.call(this, this.options);
 

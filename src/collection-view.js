@@ -7,10 +7,6 @@
 // and renders an individual child view for each model.
 Marionette.CollectionView = Backbone.View.extend({
 
-  // used as the prefix for child view events
-  // that are forwarded through the collectionview
-  childViewEventPrefix: 'childview',
-
   // flag for maintaining the sorted order of the collection
   sort: true,
 
@@ -22,27 +18,20 @@ Marionette.CollectionView = Backbone.View.extend({
   // option to pass `{comparator: compFunction()}` to allow the `CollectionView`
   // to use a custom sort order for the collection.
   constructor: function(options) {
-    this.once('render', this._initialEvents);
+    _.bind(this.render, this);
 
-    this._initChildViewStorage();
-    this.initRenderBuffer();
-
-    _.bindAll(this, 'render');
-
-    // this exposes view options to the view initializer
-    // this is a backfill since backbone removed the assignment
-    // of this.options
-    // at some point however this may be removed
     this.options = _.extend({}, _.result(this, 'options'), options);
 
-    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
-    this._behaviors = Marionette.Behaviors(this, behaviors);
+    Marionette.MonitorDOMRefresh(this);
+
+    this.once('render', this._initialEvents);
+    this._initChildViewStorage();
+    this.initRenderBuffer();
+    this._initBehaviors();
 
     Backbone.View.call(this, this.options);
 
     this.delegateEntityEvents();
-
-    Marionette.MonitorDOMRefresh(this);
 
     this.on({
       'before:show':   this._onBeforeShowCalled,
