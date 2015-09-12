@@ -54,6 +54,8 @@ Marionette.ViewMixin = {
     return Marionette.normalizeUIValues(hash, uiBindings || ui, properties);
   },
 
+  childViewEventPrefix: 'childview',
+
   // Configure `triggers` to forward DOM events to view
   // events. `triggers: {"click .foo": "do:foo"}`
   configureTriggers: function() {
@@ -68,6 +70,11 @@ Marionette.ViewMixin = {
       events[key] = this._buildViewTrigger(value);
       return events;
     }, {}, this);
+  },
+
+  _initBehaviors: function() {
+    var behaviors = Marionette._getValue(this.getOption('behaviors'), this);
+    this._behaviors = Marionette.Behaviors(this, behaviors);
   },
 
   // Overriding Backbone.View's `delegateEvents` to handle
