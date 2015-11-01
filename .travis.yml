@@ -20,6 +20,6 @@ env: MAINRUN=true
 before_install:
   - npm config set ca ""
 install:
-  - curl -L https://rawgit.com/marionettejs/travis-ci-setup/master/ci.sh | bash
+  - curl -L https://rawgit.com/paulfalgout/travis-ci-setup/master/ci.sh | bash
 after_success:
   - if [[ $MAINRUN == true ]]; then npm run-script coveralls; fi
