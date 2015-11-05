@@ -1,4 +1,4 @@
-describe('Marionette.deprecate', function() {
+xdescribe('Marionette.deprecate', function() {
   beforeEach(function() {
     Marionette.DEV_MODE = true;
     this.sinon.spy(Marionette.deprecate, '_warn');

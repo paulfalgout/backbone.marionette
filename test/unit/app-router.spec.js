@@ -1,4 +1,4 @@
-describe('app router', function() {
+xdescribe('app router', function() {
   'use strict';
 
   afterEach(function() {

@@ -28,7 +28,7 @@ if (!global.document || !global.window) {
 require('babel-core/register');
 require('./setup')();
 
-global.$ = global.jQuery = require('jquery');
+global.$ = require('jquery')(global.window);
 global._ = require('underscore');
 global.Backbone = require('backbone');
 global.Backbone.$ = global.$;
