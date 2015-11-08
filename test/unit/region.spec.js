@@ -1,4 +1,3 @@
-var jQuery = $;
 describe('region', function() {
   'use strict';
 

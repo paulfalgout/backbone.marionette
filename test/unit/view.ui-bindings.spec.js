@@ -1,5 +1,3 @@
-var jQuery = $;
-
 describe('view ui elements', function() {
   'use strict';
 
