@@ -39,7 +39,7 @@ describe('trigger event and method name', function() {
       expect(this.methodHandler).to.have.been.calledOnce;
     });
 
-    xit('returns the value returned by the on{Event} method', function() {
+    it('returns the value returned by the on{Event} method', function() {
       expect(this.triggerMethodSpy).to.have.been.calledOnce.and.returned(this.returnValue);
     });
 
@@ -141,7 +141,7 @@ describe('trigger event and method name', function() {
       this.childView.$el.click();
     });
 
-    xit('should fire the event method once', function() {
+    it('should fire the event method once', function() {
       expect(this.onChildviewFooClickStub).to.have.been.calledOnce;
     });
   });
@@ -162,7 +162,7 @@ describe('trigger event and method name', function() {
         expect(this.methodHandler).to.have.been.calledOnce;
       });
 
-      xit('should return the value returned by the on{Event} method', function() {
+      it('should return the value returned by the on{Event} method', function() {
         expect(this.triggerMethodSpy)
           .to.have.been.calledOnce
           .and.returned(this.returnValue);
@@ -187,7 +187,7 @@ describe('trigger event and method name', function() {
         expect(this.methodHandler).to.have.been.calledOnce;
       });
 
-      xit('should return the value returned by the on{Event} method', function() {
+      it('should return the value returned by the on{Event} method', function() {
         expect(this.triggerMethodSpy)
           .to.have.been.calledOnce
           .and.returned(this.returnValue);

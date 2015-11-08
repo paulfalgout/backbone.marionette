@@ -1,4 +1,4 @@
-xdescribe('marionette object', function() {
+describe('marionette object', function() {
 
   describe('when creating an object', function() {
 

@@ -1,4 +1,4 @@
-xdescribe('Marionette radio helpers', function() {
+describe('Marionette radio helpers', function() {
 
   describe('when creating a Marionette.Object', function() {
 
