@@ -92,6 +92,32 @@ var View = Backbone.View.extend({
     return this;
   },
 
+  // Internal method to render the template with the serialized data
+  // and template context via the `Marionette.Renderer` object.
+  _renderTemplate: function() {
+    var template = this.getTemplate();
+
+    // Allow template-less views
+    if (template === false) {
+      return;
+    }
+
+    // Add in entity data and template context
+    var data = this.mixinTemplateContext(this.serializeData());
+
+    // Render and add to el
+    var html = Renderer.render(template, data, this);
+    this.attachElContent(html);
+  },
+
+  // Get the template for this view
+  // instance. You can set a `template` attribute in the view
+  // definition or pass a `template: "whatever"` parameter in
+  // to the constructor options.
+  getTemplate: function() {
+    return this.getOption('template');
+  },
+
   // Attaches the content of a given view.
   // This method can be overridden to optimize rendering,
   // or to render in a non standard way.
