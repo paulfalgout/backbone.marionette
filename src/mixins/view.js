@@ -172,7 +172,11 @@ const ViewMixin = {
 
   // import the `triggerMethod` to trigger events with corresponding
   // methods if the method exists
-  triggerMethod() {
+  triggerMethod(event) {
+    if (this._monitorEvents && this._monitorEvents[event]) {
+      this._monitorEvents[event].call(this);
+    }
+
     const ret = triggerMethod.apply(this, arguments);
 
     this._triggerEventOnBehaviors.apply(this, arguments);

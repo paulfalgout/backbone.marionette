@@ -63,17 +63,20 @@ function handleRender() {
 // Monitor a view's state, propagating attach/detach events to children and firing dom:refresh
 // whenever a rendered view is attached or an attached view is rendered.
 function monitorViewEvents(view) {
-  if (view._areViewEventsMonitored) { return; }
+  if (view._monitorEvents) { return; }
 
-  view._areViewEventsMonitored = true;
-
-  view.on({
+  view._monitorEvents = {
     'before:attach': handleBeforeAttach,
     'attach': handleAttach,
     'before:detach': handleBeforeDetach,
     'detach': handleDetach,
     'render': handleRender
-  });
+  };
+
+  // Handles non-Marionette views
+  if (!view.triggerMethod) {
+    view.on(view._monitorEvents);
+  }
 }
 
 export default monitorViewEvents;
