@@ -193,7 +193,7 @@ const ViewMixin = {
   _childViewEventHandler(eventName, ...args) {
     const childViewEvents = this.normalizeMethods(this._childViewEvents);
 
-    // call collectionView childViewEvent if defined
+    // call childViewEvent if defined
     if (typeof childViewEvents !== 'undefined' && _.isFunction(childViewEvents[eventName])) {
       childViewEvents[eventName].apply(this, args);
     }

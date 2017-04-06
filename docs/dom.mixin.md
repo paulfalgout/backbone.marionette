@@ -24,11 +24,6 @@ other DOM functions.
 Takes the DOM node `el` and appends the rendered `children` to the end of the
 element's contents.
 
-### `beforeEl(el, sibling)`
-
-Add `sibling` to the DOM immediately before the DOM node `el`. The `sibling`
-will be at the same level as `el`.
-
 ### `replaceEl(newEl, oldEl)`
 
 Remove `oldEl` from the DOM and put `newEl` in its place.

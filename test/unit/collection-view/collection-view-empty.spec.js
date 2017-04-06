@@ -1,10 +1,10 @@
 // Anything related to emptyView
 
 import _ from 'underscore';
-import CollectionView from '../../../src/next-collection-view';
+import CollectionView from '../../../src/collection-view';
 import View from '../../../src/view';
 
-describe('NextCollectionView -  Empty', function() {
+describe('CollectionView -  Empty', function() {
   let MyEmptyView;
   let MyCollectionView;
 

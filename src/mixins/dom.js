@@ -12,10 +12,6 @@ export default {
     Backbone.$(el).append(children);
   },
 
-  beforeEl(el, sibling) {
-    Backbone.$(el).before(sibling);
-  },
-
   replaceEl(newEl, oldEl) {
     if (newEl === oldEl) {
       return;
