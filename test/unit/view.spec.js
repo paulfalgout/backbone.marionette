@@ -45,7 +45,7 @@ describe('item view', function() {
     });
 
     it('should throw an exception because there was no valid template', function() {
-      expect(this.view.render).to.throw('Cannot render the template since its false, null or undefined.');
+      expect(this.view.render).to.throw('Cannot render2 the template since its false, null or undefined.');
     });
   });
 
