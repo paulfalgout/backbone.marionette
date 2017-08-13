@@ -1,0 +1,18 @@
+{
+  "username": "paulfalgout1",
+  "test_framework" : "mocha",
+  "test_path": "test/runner.html",
+  "browsers": [
+    "chrome_previous",
+    "chrome_latest",
+    "firefox_previous",
+    "firefox_latest",
+    "ie_9",
+    "ie_10",
+    "ie_11",
+    "edge_previous",
+    "edge_latest",
+    "safari_previous",
+    "safari_latest"
+  ]
+}

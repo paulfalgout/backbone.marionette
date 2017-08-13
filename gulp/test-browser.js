@@ -2,6 +2,9 @@ import gulp from 'gulp';
 import util from 'gulp-util';
 import livereload from 'gulp-livereload';
 import easySauce from 'easy-sauce';
+import browserstackRunner from 'browserstack-runner';
+
+import bsConfig from '../browserstack.json';
 
 import { rollup } from 'rollup';
 import babel from 'rollup-plugin-babel';
@@ -86,8 +89,19 @@ function sauceRunner() {
     });
 }
 
+function browserstackTask() {
+  browserstackRunner.run(bsConfig, function(error, report) {
+    if(error) {
+      util.log(util.colors.red((error)));
+      process.exit(1);
+    }
+    console.log("Test Finished");
+  });
+}
+
+
 gulp.task('browser-bundle', ['lint-src', 'lint-test'], bundle);
 
 gulp.task('test-browser', ['browser-bundle'], browserWatch);
 
-gulp.task('test-cross-browser', ['browser-bundle'], sauceRunner);
+gulp.task('test-cross-browser', ['browser-bundle'], browserstackTask);
