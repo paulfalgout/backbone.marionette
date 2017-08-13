@@ -1,17 +1,27 @@
 sudo: false
 language: node_js
 node_js:
-  - "6"
+- '6'
 cache: yarn
 env:
+  matrix:
   - TEST_SUITE=coverage
   - TEST_SUITE=browser
   - TEST_SUITE=lodash USE_LODASH=1
+  global:
+  - secure: jAYdUzysV8mbz9SogA176gX71uLwnCyl6eBYYGb1S3CgZNEOpnUhPsazfnicyMmnYK0lHFqTMKplP+s9FmMTZHa70fN6dWQjQpE4WU1ibekx9688XeoAu+fCK7MvQHoZ/NWCqoo1X/yhSJaYoVH9E5T6JqiAM5xFgc4XcnuzG0k=
+  - secure: WDvfeUBEIZF5WOnv3WBqIU5Ow6T+VgC9H2KMsqaJEKFHZ6THWTJBfYpPBAiBFbl6Wa9s8bOXgTSa81QCq4mFw1FugUUUPDGL+koWTzkDROYtN/qLHVSRxTn+6Sb6Ri9ydwNyb02RigkMwwXxOXoZQiGaYoY6bvEWZXHlos9NQ8w=
 after_install:
-  - yarn install travis-ci
+- yarn install travis-ci
 script:
-  - if [[ $TEST_SUITE = "coverage" ]]; then yarn run coveralls; fi
-  - if [[ $TEST_SUITE = "browser" ]]  && [[ $SAUCE_USERNAME ]]; then yarn run test-cross-browser; fi
-  - if [[ $TEST_SUITE = "lodash" ]]; then yarn run test; fi
+- if [[ $TEST_SUITE = "coverage" ]]; then yarn run coveralls; fi
+- if [[ $TEST_SUITE = "browser" ]]; then yarn run test-cross-browser; fi
+- if [[ $TEST_SUITE = "lodash" ]]; then yarn run test; fi
 after_success:
-  - if [[ $TRAVIS_BRANCH = "master" ]] && [[ $TRAVIS_PULL_REQUEST = "false" ]]; then node trigger-deploy-mn-com.js; fi
+- if [[ $TRAVIS_BRANCH = "master" ]] && [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
+  node trigger-deploy-mn-com.js; fi
+addons:
+  sauce_connect:
+    username: marionettejs
+  jwt:
+    secure: cS2WWLFIpXcPdlhe8L5Op3qAZHhXaUhtpt1/IU87JVt5owD6W5+MyqkQ/xNxBw1F1T7uVhwwo6cbViuLm/q2jZNpwXRa/LkC5IjApQSoM2bDS9DEz3Ln1jt4ABCCXH/5wUrt1qWTkWITOhX3hbfjv4Y3EXwvWjvh2v1kthZwP5I=

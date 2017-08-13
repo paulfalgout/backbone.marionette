@@ -26,8 +26,7 @@ const sauceConf = {
     ['OS X 10.11', 'chrome', 'latest'],
     ['OS X 10.11', 'firefox', "latest"],
     ['OS X 10.11', 'safari', '9.0']
-  ],
-  service: 'sauce-connect'
+  ]
 };
 
 function bundle() {
